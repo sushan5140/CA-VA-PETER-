@@ -7,3 +7,9 @@ coverage/
 .DS_Store
 Thumbs.db
 *.log
+__pycache__/
+*.pyc
+.venv/
+g4p1_results/
+*.ckpt
+*.safetensors

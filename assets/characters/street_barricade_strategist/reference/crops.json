@@ -1,0 +1,100 @@
+{
+  "source_sha256": "4016419d22f2174031175f01a5a8e72196105f00e1da32d66ec8bcc5983bb32e",
+  "source_dimensions": [
+    1491,
+    1055
+  ],
+  "crop_boxes_xyxy": {
+    "front_clean": [
+      188,
+      12,
+      446,
+      571
+    ],
+    "three_quarter": [
+      439,
+      13,
+      642,
+      571
+    ],
+    "side": [
+      647,
+      14,
+      793,
+      571
+    ],
+    "back": [
+      798,
+      14,
+      1004,
+      571
+    ],
+    "face_neutral": [
+      1007,
+      49,
+      1158,
+      274
+    ],
+    "face_determined": [
+      1167,
+      49,
+      1319,
+      274
+    ],
+    "hair_front": [
+      1043,
+      359,
+      1153,
+      525
+    ],
+    "hair_side": [
+      1156,
+      359,
+      1250,
+      525
+    ],
+    "hair_back": [
+      1254,
+      359,
+      1363,
+      525
+    ],
+    "jacket_shirt": [
+      18,
+      626,
+      250,
+      797
+    ],
+    "scarf": [
+      258,
+      626,
+      401,
+      797
+    ],
+    "satchel": [
+      409,
+      626,
+      632,
+      797
+    ],
+    "trousers": [
+      640,
+      626,
+      826,
+      797
+    ],
+    "glove": [
+      834,
+      626,
+      997,
+      797
+    ],
+    "sneaker": [
+      1008,
+      626,
+      1219,
+      797
+    ]
+  },
+  "front_note": "Original pixels except a background-only title removal patch; inference scripts apply rembg."
+}
