@@ -37,6 +37,12 @@ def execute(name: str, cmd: list[str], cwd: Path | None = None, env: dict | None
     return result.returncode == 0
 
 
+def has_torch(python: Path) -> bool:
+    check = subprocess.run([str(python), "-c", "import torch; assert torch.cuda.is_available()"],
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    return check.returncode == 0
+
+
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     if not INPUT.is_file():
@@ -87,9 +93,22 @@ def main() -> None:
 
         venv = OUT / "venvs" / name
         py = venv / "bin" / "python"
-        if not py.exists() and not execute(f"venv_{name}", [sys.executable, "-m", "venv", "--system-site-packages", str(venv)]):
-            manifest["runs"][name] = "venv_failed"
-            continue
+        if not py.exists():
+            if sys.version_info >= (3, 13) and Path("/usr/bin/python3.12").is_file() and shutil.which("uv"):
+                venv_cmd = ["uv", "venv", "--python", "/usr/bin/python3.12", "--seed", "--clear", str(venv)]
+            else:
+                venv_cmd = [sys.executable, "-m", "venv", "--system-site-packages", str(venv)]
+            if not execute(f"venv_{name}", venv_cmd):
+                manifest["runs"][name] = "venv_failed"
+                continue
+        if not has_torch(py):
+            if not shutil.which("uv") or not execute(
+                f"torch_{name}",
+                ["uv", "pip", "install", "--python", str(py), "torch==2.5.1", "torchvision==0.20.1",
+                 "--index-url", "https://download.pytorch.org/whl/cu121"],
+            ):
+                manifest["runs"][name] = "CUDA_PyTorch_install_failed"
+                continue
         setup_version = "setuptools==69.5.1" if name == "sf3d" else "setuptools>=49.6.0"
         if not execute(f"build_tools_{name}", [str(py), "-m", "pip", "install", "-U", setup_version, "wheel"]):
             manifest["runs"][name] = "build_tools_failed"
