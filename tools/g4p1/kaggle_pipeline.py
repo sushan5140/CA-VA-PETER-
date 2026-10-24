@@ -21,8 +21,8 @@ INPUT = ROOT / "assets/characters/street_barricade_strategist/reference/front_cl
 OUT = Path(os.environ.get("G4P1_OUTPUT", "/kaggle/working/g4p1_results"))
 UPSTREAM = OUT / "upstream"
 REPOS = {
-    "sf3d": ("https://github.com/Stability-AI/stable-fast-3d", "ff21fc491b4dc5314bf6734c7c0dabd86b5f5bb2"),
     "triposr": ("https://github.com/VAST-AI-Research/TripoSR", "107cefdc244c39106fa830359024f6a2f1c78871"),
+    "sf3d": ("https://github.com/Stability-AI/stable-fast-3d", "ff21fc491b4dc5314bf6734c7c0dabd86b5f5bb2"),
 }
 
 
@@ -68,6 +68,9 @@ def main() -> None:
 
     UPSTREAM.mkdir(exist_ok=True)
     for name, (url, commit) in REPOS.items():
+        if name == "sf3d" and not os.environ.get("HF_TOKEN"):
+            manifest["runs"][name] = "not_run: gated Hugging Face checkpoint requires accepted access and HF_TOKEN"
+            continue
         checkout = UPSTREAM / name
         if not checkout.exists():
             if not execute(f"clone_{name}", ["git", "clone", "--depth", "1", url, str(checkout)]):
