@@ -128,6 +128,10 @@ def main() -> None:
             manifest["runs"][name] = "dependency_install_failed"
             continue
         if name == "triposr":
+            if not execute("patch_triposr_bake", [sys.executable,
+                    str(ROOT / "tools/g4p1/patch_triposr_bake.py"), str(checkout)]):
+                manifest["runs"][name] = "upstream_bake_patch_failed"
+                continue
             if not execute("torchmcubes_build_tools", [str(py), "-m", "pip", "install", "scikit-build-core>=1.0", "pybind11>=2.10"]):
                 manifest["runs"][name] = "torchmcubes_build_tools_failed"
                 continue
@@ -164,6 +168,12 @@ def main() -> None:
             cmd = [str(py), "run.py", str(INPUT), "--output-dir", str(run_out),
                    "--bake-texture", "--texture-resolution", "1024",
                    "--model-save-format", "obj", model_option, str(checkpoint)]
+            if not os.environ.get("DISPLAY"):
+                xvfb = shutil.which("xvfb-run")
+                if not xvfb:
+                    manifest["runs"][name] = "headless_display_missing: install xvfb"
+                    continue
+                cmd = [xvfb, "-a", *cmd]
         if not execute(f"inference_{name}", cmd, cwd=checkout, env=env):
             manifest["runs"][name] = "inference_failed: inspect logs"
             continue
