@@ -35,6 +35,8 @@ PyTorch 2.5.1 there. TripoSR's `torchmcubes` dependency is pinned to
 `a9ac95aa329957ba646e7bb057f825f5dfa77f38` and built without isolation
 against that PyTorch, as its current [README](https://github.com/tatsy/torchmcubes)
 requires. Its other requirements remain those of the pinned TripoSR checkout.
+The runner also installs CPU `onnxruntime` for TripoSR's `rembg` step, because
+the current unpinned `rembg` dependency does not pull that optional runtime.
 
 SF3D's official checkpoint requires the account holder to accept its Hugging
 Face conditions and supply a read token. The community license also has

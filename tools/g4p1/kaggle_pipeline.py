@@ -119,7 +119,7 @@ def main() -> None:
             # Upstream's torchmcubes now requires an installed torch in its build
             # environment; its README explicitly requires --no-build-isolation.
             filtered = OUT / "triposr_requirements_without_torchmcubes.txt"
-            filtered.write_text("numpy==1.26.4\n" + "".join(
+            filtered.write_text("numpy==1.26.4\nonnxruntime==1.23.2\n" + "".join(
                 line for line in requirements.read_text(encoding="utf-8").splitlines(keepends=True)
                 if "github.com/tatsy/torchmcubes" not in line
             ), encoding="utf-8")
