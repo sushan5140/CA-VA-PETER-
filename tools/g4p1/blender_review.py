@@ -3,8 +3,8 @@
 blender -b -t 2 --python tools/g4p1/blender_review.py -- \
   --input candidate.glb --render-dir renders [--output cleaned.glb]
 
-The four cameras assume the imported model faces Blender -Y. Review the preview
-before naming the views; single-view reconstruction can choose another heading.
+The four cameras assume the TripoSR conversion faces Blender +X. Review the
+preview before naming views from another reconstruction pipeline.
 """
 
 import argparse
@@ -104,7 +104,7 @@ def main():
     scene.render.resolution_percentage = 100
     scene.render.film_transparent = True
     scene.render.image_settings.file_format = "PNG"
-    for name, degrees in [("front", 0), ("three_quarter", 45), ("side", 90), ("back", 180)]:
+    for name, degrees in [("front", 90), ("three_quarter", 45), ("side", 0), ("back", 270)]:
         theta = math.radians(degrees)
         camera.location = (3.5 * math.sin(theta), -3.5 * math.cos(theta), 1.0)
         camera.rotation_euler = (Vector((0, 0, 0.85)) - camera.location).to_track_quat("-Z", "Y").to_euler()
