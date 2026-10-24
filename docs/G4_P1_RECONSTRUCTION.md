@@ -28,6 +28,13 @@ The exact dependency versions installed by the Kaggle run are captured in
 revisions and GPU details are recorded in `manifest.json`. The two Python
 environments are independent because the source projects pin different
 `transformers` and `trimesh` versions. They never enter the game's frontend.
+Kaggle's observed base image uses Python 3.13.15 and CUDA PyTorch 2.11.0,
+while the upstream dependencies need an older Python environment. The runner
+creates Python 3.12 virtual environments with `uv` and installs official CUDA
+PyTorch 2.5.1 there. TripoSR's `torchmcubes` dependency is pinned to
+`a9ac95aa329957ba646e7bb057f825f5dfa77f38` and built without isolation
+against that PyTorch, as its current [README](https://github.com/tatsy/torchmcubes)
+requires. Its other requirements remain those of the pinned TripoSR checkout.
 
 SF3D's official checkpoint requires the account holder to accept its Hugging
 Face conditions and supply a read token. The community license also has

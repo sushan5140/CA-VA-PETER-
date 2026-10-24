@@ -24,6 +24,7 @@ REPOS = {
     "triposr": ("https://github.com/VAST-AI-Research/TripoSR", "107cefdc244c39106fa830359024f6a2f1c78871"),
     "sf3d": ("https://github.com/Stability-AI/stable-fast-3d", "ff21fc491b4dc5314bf6734c7c0dabd86b5f5bb2"),
 }
+TORCHMCUBES_COMMIT = "a9ac95aa329957ba646e7bb057f825f5dfa77f38"
 
 
 def execute(name: str, cmd: list[str], cwd: Path | None = None, env: dict | None = None) -> bool:
@@ -113,9 +114,27 @@ def main() -> None:
         if not execute(f"build_tools_{name}", [str(py), "-m", "pip", "install", "-U", setup_version, "wheel"]):
             manifest["runs"][name] = "build_tools_failed"
             continue
-        if not execute(f"install_{name}", [str(py), "-m", "pip", "install", "-r", "requirements.txt"], cwd=checkout):
+        requirements = checkout / "requirements.txt"
+        if name == "triposr":
+            # Upstream's torchmcubes now requires an installed torch in its build
+            # environment; its README explicitly requires --no-build-isolation.
+            filtered = OUT / "triposr_requirements_without_torchmcubes.txt"
+            filtered.write_text("numpy==1.26.4\n" + "".join(
+                line for line in requirements.read_text(encoding="utf-8").splitlines(keepends=True)
+                if "github.com/tatsy/torchmcubes" not in line
+            ), encoding="utf-8")
+            requirements = filtered
+        if not execute(f"install_{name}", [str(py), "-m", "pip", "install", "-r", str(requirements)], cwd=checkout):
             manifest["runs"][name] = "dependency_install_failed"
             continue
+        if name == "triposr":
+            if not execute("torchmcubes_build_tools", [str(py), "-m", "pip", "install", "scikit-build-core>=1.0", "pybind11>=2.10"]):
+                manifest["runs"][name] = "torchmcubes_build_tools_failed"
+                continue
+            source = f"git+https://github.com/tatsy/torchmcubes.git@{TORCHMCUBES_COMMIT}"
+            if not execute("torchmcubes", [str(py), "-m", "pip", "install", "--no-build-isolation", source]):
+                manifest["runs"][name] = "torchmcubes_build_failed"
+                continue
         execute(f"versions_{name}", [str(py), "-m", "pip", "freeze"])
         run_out = OUT / name
         run_out.mkdir(exist_ok=True)
