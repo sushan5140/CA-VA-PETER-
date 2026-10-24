@@ -109,7 +109,7 @@ def main() -> None:
             ):
                 manifest["runs"][name] = "CUDA_PyTorch_install_failed"
                 continue
-        setup_version = "setuptools==69.5.1" if name == "sf3d" else "setuptools>=49.6.0"
+        setup_version = "setuptools==69.5.1"
         if not execute(f"build_tools_{name}", [str(py), "-m", "pip", "install", "-U", setup_version, "wheel"]):
             manifest["runs"][name] = "build_tools_failed"
             continue
